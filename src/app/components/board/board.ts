@@ -1,9 +1,10 @@
-import { ChangeDetectorRef, Component, HostListener, NgZone, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, HostListener, Input, NgZone, OnInit, Output } from '@angular/core';
 import { Board } from '../../interfaces/board';
 import { ShapeDescension } from '../../services/shape-descension';
 import { CommonModule } from '@angular/common';
 import { ActiveShape } from '../../interfaces/shape';
 import { UserMechanics } from '../../directives/user-mechanics';
+import { ScoreService } from '../../services/score-service';
 
 @Component({
   selector: 'app-board',
@@ -15,8 +16,12 @@ export class TetrisBoard implements OnInit{
   activeShape?: ActiveShape;
   board: Board = Array(24).fill([]).map(() => Array(10).fill({}));
 
+  @Input() linesCleared!: number;
+  @Output() linesClearedChange = new EventEmitter<number>();
+
   constructor(
     private shapeDescension: ShapeDescension,
+    private scoreService: ScoreService
   ) {}
 
   async ngOnInit() {
@@ -46,8 +51,14 @@ export class TetrisBoard implements OnInit{
       // Use await to trigger event loop and force change detection to complete
       await this.wait(200);
     }
-   }
 
+    // Once shape is in final place, check if any lines can be cleared
+    const {linesCleared } = this.scoreService.getLinesCleared(board);
+    if (linesCleared > 0) {
+      this.linesClearedChange.emit(this.linesCleared + linesCleared);
+      await this.wait(200);
+    }
+   }
   }
 
   private async wait(ms: number) {

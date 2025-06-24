@@ -1,7 +1,6 @@
 .board {
     display: flex;
     flex-direction: column;
-    margin-top: 25%;
 
     .row {
         display: flex;
@@ -11,10 +10,6 @@
             width: 25px;
             height: 25px;
             border: 1px solid black;
-        }
-
-        .hiddenCell {
-            //border: none;
         }
     }
 }
