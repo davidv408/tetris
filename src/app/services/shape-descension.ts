@@ -34,7 +34,7 @@ export class ShapeDescension {
 
   constructor() { }
 
-  public pickNewShape(board: Board): ActiveShape {
+  public pickNewShape(): ActiveShape {
     const shape = this.shapes[Math.floor(Math.random()  * this.shapes.length)]; 
 
     // Place the shape (4x4 matrix) at the top of the board (20 x 10)
@@ -43,8 +43,6 @@ export class ShapeDescension {
       shape,
       color: 'blue'
     };
-
-    this.drawActiveShape(activeShape, board);
 
     return activeShape;
   }

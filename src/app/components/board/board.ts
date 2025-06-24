@@ -12,12 +12,14 @@ import { ScoreService } from '../../services/score-service';
   templateUrl: './board.html',
   styleUrl: './board.scss'
 })
-export class TetrisBoard implements OnInit{
+export class TetrisBoard implements OnInit {
   activeShape?: ActiveShape;
-  board: Board = Array(24).fill([]).map(() => Array(10).fill({}));
+  board?: Board;
 
   @Input() linesCleared!: number;
   @Output() linesClearedChange = new EventEmitter<number>();
+
+  @Output() gameOverChange = new EventEmitter<boolean>();
 
   constructor(
     private shapeDescension: ShapeDescension,
@@ -25,30 +27,39 @@ export class TetrisBoard implements OnInit{
   ) {}
 
   async ngOnInit() {
+    // Initialize 24 x 10 2D Matrix.
+    this.board = Array(24).fill([]).map(() => Array(10).fill({}));
     for(let row = 0; row < this.board.length; row++) {
       for(let col = 0; col < this.board[row].length; col++) {
-        this.board[row][col] = { id: `row${row}col${col}`, color: '', value: 0 }; // Initialize each cell with an empty color
+        this.board[row][col] = { id: `row${row}col${col}`, color: '', value: 0 };
       }
     }
 
-   await this.wait(1000);
-
    while(true) {
-    this.activeShape = this.shapeDescension.pickNewShape(this.board);
+    // Draw shape at initial position
+    this.activeShape = this.shapeDescension.pickNewShape();
+    const {r0, c0} = this.activeShape.position;
+    let inFinalPosition = this.shapeDescension.moveActiveShape(this.activeShape, {r0: r0, c0}, this.board);
     await this.wait(200);
 
-    let inFinalPosition = false;
-    do {
-      const {r0, c0} = this.activeShape.position;
+    // If shape is not in it's final position, move it down one line
+    while(!inFinalPosition) {
+       const {r0, c0} = this.activeShape.position;
       inFinalPosition = this.shapeDescension.moveActiveShape(this.activeShape, {r0: r0+1, c0}, this.board);
       await this.wait(200);
-    } while (!inFinalPosition)
+    }
 
     // Once shape is in final place, check if any lines can be cleared
     const linesCleared = this.scoreService.getLinesCleared(this.board);
     if (linesCleared > 0) {
       this.linesClearedChange.emit(this.linesCleared + linesCleared);
       await this.wait(200);
+    }
+
+    // If active shape is still in original position, then game is over
+    if (this.activeShape.position.r0 === 0) {
+      this.gameOverChange.emit(true);
+      break;
     }
    }
   }
