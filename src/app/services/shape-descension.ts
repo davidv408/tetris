@@ -34,7 +34,7 @@ export class ShapeDescension {
 
   constructor() { }
 
-  public pickNewShape(board: Board): {activeShape: ActiveShape, board: Board} {
+  public pickNewShape(board: Board): ActiveShape {
     const shape = this.shapes[Math.floor(Math.random()  * this.shapes.length)]; 
 
     // Place the shape (4x4 matrix) at the top of the board (20 x 10)
@@ -46,10 +46,10 @@ export class ShapeDescension {
 
     this.drawActiveShape(activeShape, board);
 
-    return {activeShape, board};
+    return activeShape;
   }
 
-  public rotateMatrix90degrees(activeShape: ActiveShape, board: Board): {activeShape: ActiveShape, board: Board} {
+  public rotateMatrix90degrees(activeShape: ActiveShape, board: Board): void {
     // Clear active shape from the board
     this.clearActiveShape(activeShape, board);
 
@@ -73,28 +73,26 @@ export class ShapeDescension {
 
     // Draw shape on board
     this.drawActiveShape(activeShape, board);
-
-    return {activeShape, board};
   }
 
 
-  public moveActiveShape(activeShape: ActiveShape, newPosition: {r0: number, c0: number}, board: Board): {activeShape: ActiveShape, board: Board, done: boolean} {
+  public moveActiveShape(activeShape: ActiveShape, newPosition: {r0: number, c0: number}, board: Board): boolean {
     this.clearActiveShape(activeShape, board);
 
     // If shape is at the end of the board, then stop the shape descension.
     if (!this.canDrawActiveShape(activeShape, newPosition, board)) {
       this.drawActiveShape(activeShape, board);
-      return {activeShape, board, done: true};
+      return true;
     }
 
      // Draw at new position
     activeShape.position = newPosition;
     this.drawActiveShape(activeShape, board);
 
-    return {activeShape, board, done: false};
+    return false;
   }
 
-  private clearActiveShape(activeShape: ActiveShape, board: Board): {activeShape: ActiveShape, board: Board} {
+  private clearActiveShape(activeShape: ActiveShape, board: Board): void {
     const {r0, c0} = activeShape.position;
     const shape = activeShape.shape;
 
@@ -106,8 +104,6 @@ export class ShapeDescension {
         }
        }
     }
-
-    return {activeShape, board};
   }
 
   private canDrawActiveShape(activeShape: ActiveShape, newPosition: {r0: number, c0: number}, board: Board): boolean {
@@ -138,7 +134,7 @@ export class ShapeDescension {
     return true;
   }
 
-  private drawActiveShape(activeShape: ActiveShape, board: Board) {
+  private drawActiveShape(activeShape: ActiveShape, board: Board): void {
     const shape = activeShape.shape;
     const {r0, c0} = activeShape.position;
 
@@ -151,6 +147,5 @@ export class ShapeDescension {
         board[row+r0][col+c0].value = shape[row][col];
        }
     }
-
   }
 }

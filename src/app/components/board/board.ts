@@ -31,29 +31,21 @@ export class TetrisBoard implements OnInit{
       }
     }
 
-    await this.wait(1000);
+   await this.wait(1000);
 
    while(true) {
-    const { activeShape, board} = this.shapeDescension.pickNewShape(this.board);
-    this.activeShape = activeShape;
-    this.board = board;
+    this.activeShape = this.shapeDescension.pickNewShape(this.board);
     await this.wait(200);
-    let continueDescension = false;
 
-    while(!continueDescension) {
+    let inFinalPosition = false;
+    do {
       const {r0, c0} = this.activeShape.position;
-      const {activeShape: newActiveShape, board: newBoard, done } = this.shapeDescension.moveActiveShape(this.activeShape, {r0: r0+1, c0}, this.board);
-
-      // Re-intializing the component properties will trigger change detection
-      this.activeShape = newActiveShape;
-      this.board = newBoard;
-      continueDescension = done;
-      // Use await to trigger event loop and force change detection to complete
+      inFinalPosition = this.shapeDescension.moveActiveShape(this.activeShape, {r0: r0+1, c0}, this.board);
       await this.wait(200);
-    }
+    } while (!inFinalPosition)
 
     // Once shape is in final place, check if any lines can be cleared
-    const {linesCleared } = this.scoreService.getLinesCleared(board);
+    const {linesCleared } = this.scoreService.getLinesCleared(this.board);
     if (linesCleared > 0) {
       this.linesClearedChange.emit(this.linesCleared + linesCleared);
       await this.wait(200);
@@ -61,6 +53,11 @@ export class TetrisBoard implements OnInit{
    }
   }
 
+  /**
+   * Use await to trigger event loop and force change detection to complete.
+   * @param ms 
+   * @returns 
+   */
   private async wait(ms: number) {
     return new Promise((resolve) => {
       setTimeout(resolve, ms);
