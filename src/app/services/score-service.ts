@@ -8,7 +8,7 @@ export class ScoreService {
 
   constructor() { }
 
-  public getLinesCleared(board: Board) {
+  public getLinesCleared(board: Board): number {
     let allLinesChecked = false;
     let linesCleared = 0;
 
@@ -21,7 +21,7 @@ export class ScoreService {
     }
 
     this.reinitializeIds(board);
-    return {linesCleared};
+    return linesCleared;
   }
 
   private clearedLine(board: Board) {
@@ -39,7 +39,6 @@ export class ScoreService {
   }
 
   private reinitializeIds(board: Board) {
-    console.log(board.length);
     for(let row = 0; row < board.length; row++) {
       for(let col = 0; col < board[row].length; col++) {
         board[row][col] = {...board[row][col], id: `row${row}col${col}`}; // Initialize each cell with an empty color

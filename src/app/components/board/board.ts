@@ -45,7 +45,7 @@ export class TetrisBoard implements OnInit{
     } while (!inFinalPosition)
 
     // Once shape is in final place, check if any lines can be cleared
-    const {linesCleared } = this.scoreService.getLinesCleared(this.board);
+    const linesCleared = this.scoreService.getLinesCleared(this.board);
     if (linesCleared > 0) {
       this.linesClearedChange.emit(this.linesCleared + linesCleared);
       await this.wait(200);
