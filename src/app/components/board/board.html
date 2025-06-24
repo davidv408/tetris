@@ -1,0 +1,11 @@
+<div class="board" appUserMechanics [board]="board" [activeShape]="activeShape">
+    @for (row of board; track $index) {
+        @let rowIndex = $index;
+        <div class="row">
+            @for (cell of row; track cell.id) {
+                <div class="cell" [style.backgroundColor]="cell.color" [ngClass]="{hiddenCell: (rowIndex < 2)}">
+                </div>
+            }
+        </div>
+    }
+</div>
