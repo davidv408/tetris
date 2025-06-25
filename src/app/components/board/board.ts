@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Board } from '../../interfaces/board';
-import { ShapeDescension } from '../../services/shape-descension';
+import { ActiveShapeService } from '../../services/active-shape-service';
 import { CommonModule } from '@angular/common';
 import { ActiveShape } from '../../interfaces/shape';
 import { UserMechanics } from '../../directives/user-mechanics';
@@ -22,7 +22,7 @@ export class TetrisBoard implements OnInit {
   @Output() gameOverChange = new EventEmitter<boolean>();
 
   constructor(
-    private shapeDescension: ShapeDescension,
+    private activeShapeService: ActiveShapeService,
     private scoreService: ScoreService
   ) {}
 
@@ -37,16 +37,16 @@ export class TetrisBoard implements OnInit {
 
    while(true) {
     // Draw shape at initial position
-    this.activeShape = this.shapeDescension.pickNewShape();
+    this.activeShape = this.activeShapeService.pickNewShape();
     const {r0, c0} = this.activeShape.position;
-    let inFinalPosition = this.shapeDescension.moveActiveShape(this.activeShape, {r0: r0, c0}, this.board);
+    let inFinalPosition = this.activeShapeService.moveActiveShape(this.activeShape, {r0: r0, c0}, this.board);
 
     // If shape is not in it's final position, move it down one line
     while(!inFinalPosition) {
       // Await here to flush any keyboard event callback functions in the Event Queue and let change detection run to update the view.
       await this.wait(200);
       const {r0, c0} = this.activeShape.position;
-      inFinalPosition = this.shapeDescension.moveActiveShape(this.activeShape, {r0: r0+1, c0}, this.board);
+      inFinalPosition = this.activeShapeService.moveActiveShape(this.activeShape, {r0: r0+1, c0}, this.board);
     }
 
     // Once shape is in final place, check if any lines can be cleared

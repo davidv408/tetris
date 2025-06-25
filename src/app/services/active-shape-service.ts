@@ -3,9 +3,9 @@ import { Board } from '../interfaces/board';
 import { ActiveShape, Shape } from '../interfaces/shape';
 
 @Injectable({
-  providedIn: 'root' // Init
+  providedIn: 'root'
 })
-export class ShapeDescension {
+export class ActiveShapeService {
   shapes: Shape[] = [
     [ // Straight
       [1, 1,1,1]
