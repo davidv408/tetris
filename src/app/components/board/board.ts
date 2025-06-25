@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, EventEmitter, HostListener, Input, NgZone, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Board } from '../../interfaces/board';
 import { ShapeDescension } from '../../services/shape-descension';
 import { CommonModule } from '@angular/common';
@@ -40,20 +40,19 @@ export class TetrisBoard implements OnInit {
     this.activeShape = this.shapeDescension.pickNewShape();
     const {r0, c0} = this.activeShape.position;
     let inFinalPosition = this.shapeDescension.moveActiveShape(this.activeShape, {r0: r0, c0}, this.board);
-    await this.wait(200);
 
     // If shape is not in it's final position, move it down one line
     while(!inFinalPosition) {
-       const {r0, c0} = this.activeShape.position;
-      inFinalPosition = this.shapeDescension.moveActiveShape(this.activeShape, {r0: r0+1, c0}, this.board);
+      // Await here to flush any keyboard event callback functions in the Event Queue and let change detection run to update the view.
       await this.wait(200);
+      const {r0, c0} = this.activeShape.position;
+      inFinalPosition = this.shapeDescension.moveActiveShape(this.activeShape, {r0: r0+1, c0}, this.board);
     }
 
     // Once shape is in final place, check if any lines can be cleared
     const linesCleared = this.scoreService.getLinesCleared(this.board);
     if (linesCleared > 0) {
       this.linesClearedChange.emit(this.linesCleared + linesCleared);
-      await this.wait(200);
     }
 
     // If active shape is still in original position, then game is over
