@@ -67,9 +67,13 @@ export class ShapeDescension {
       newShape[row].reverse();
     }
 
+    const oldShape = structuredClone(activeShape.shape);
     activeShape.shape = newShape
 
-    // Draw shape on board
+    if (!this.canDrawActiveShape(activeShape, activeShape.position, board)) {
+      activeShape.shape = oldShape; 
+    }
+
     this.drawActiveShape(activeShape, board);
   }
 
