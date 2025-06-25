@@ -1,8 +1,9 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { BoardModal } from '../board-modal/board-modal';
 
 @Component({
   selector: 'app-game-over-modal',
-  imports: [],
+  imports: [BoardModal],
   templateUrl: './game-over-modal.html',
   styleUrl: './game-over-modal.scss'
 })

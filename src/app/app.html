@@ -1,5 +1,6 @@
 <div class="app">
-    <app-board *ngIf="renderBoard" [(linesCleared)]="linesCleared" (gameOverChange)="onGameOver()"></app-board>
-    <app-score *ngIf="renderBoard" [linesCleared]="linesCleared"></app-score>
+    <app-board *ngIf="gameStarted" [(linesCleared)]="linesCleared" (gameOverChange)="onGameOver()"></app-board>
+    <app-score *ngIf="gameStarted" [linesCleared]="linesCleared"></app-score>
+    <app-start-game-modal *ngIf="!gameStarted" (gameStartedChange)="onStartGame()"></app-start-game-modal>
     <app-game-over-modal *ngIf="gameIsOver" (restartGameChange)="onRestartGame()"></app-game-over-modal>
 </div>
