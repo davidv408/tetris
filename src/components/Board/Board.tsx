@@ -1,16 +1,22 @@
-import { Fragment, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "./Board.module.css";
 import { type ActiveShape } from "../../interfaces/Shape";
 import { canDrawActiveShapeAsNewShape, canDrawActiveShapeAtPosition, drawActiveShapeAsNewShape, drawActiveShapeAtPosition, pickNewShape, rotateMatrix90Degrees } from "../../utils/ActiveShape";
-import { wait } from "../../utils/Time";
 import type { Board } from "../../interfaces/Board";
+import { clearLines, getNumCompleteLines } from "../../utils/Score";
 
 function Board() {
     const [board, setBoard] = useState(Array(20).fill([]).map(() => Array(10).fill({value: 0, color: ''})));
+    const [linesCleared, setLinesCleared] = useState(0);
     const activeShape = useRef<ActiveShape>(pickNewShape());
-
+    const keyboardInputQueue = useRef<Array<Function>>([]);
     
-    const moveActiveShape = (newPosition: {r0: number, c0: number}) => {
+    const moveActiveShape = (delta: {rowDelta?: number, colDelta?: number}) => {
+        console.log(delta);
+        const {rowDelta, colDelta} = delta;
+        const {r0, c0} = activeShape.current.position;
+        const newPosition = {r0: r0+ (rowDelta ?? 0), c0: c0+ (colDelta ?? 0)};
+
         setBoard(board => {
             if(!canDrawActiveShapeAtPosition(activeShape.current, newPosition, board)) {
                 return board;
@@ -20,65 +26,69 @@ function Board() {
             return result;
         });
     }
-  
-    useEffect(() => {(
-        async () => {
-            // Run game loop while game is not over.
-            let gameOver = false;
-            do {
-               // Draw active shape on board
-                setBoard(board => drawActiveShapeAtPosition(activeShape.current, activeShape.current.position, board));
-                await wait(200);
-
-                let inFinalPosition = false;
-                while(!inFinalPosition) {
-                    const {r0, c0} = activeShape.current.position;
-                    const newPosition = {r0: r0+1, c0}
-                    moveActiveShape(newPosition);
-                    await wait(200);
-                     
-                    // If position didn't change, then shape is final position.
-                    if(activeShape.current.position.r0 === r0) {
-                        inFinalPosition = true;
-                    }
-                }
-
-                if(activeShape.current.position.r0 === 0) {
-                    alert('Game over');
-                    gameOver = true;
-                } else {
-                     // Pick a new active shape
-                    activeShape.current = pickNewShape();
-                }
-            } while(!gameOver);
-        })();
-    }, []);
-
-
 
     useEffect(() => {
-        const onKeyDown = async (evt: KeyboardEvent) => {
-            const {r0, c0} = activeShape.current.position;
+        setBoard(board => drawActiveShapeAtPosition(activeShape.current, activeShape.current.position, board));
+    }, []);
+
+    useEffect(() => {
+        // Flush keyboard inputs
+        if(keyboardInputQueue.current.length > 0) {
+            keyboardInputQueue.current.shift()!();
+        }
+
+        // In 200ms, move the active shape down
+        const timerId = setInterval(() => {
+            moveActiveShape({rowDelta: 1});
+        }, 200);
+
+        return () => {
+            clearInterval(timerId);
+        }
+    }, [board]);
+
+    useEffect(() => {
+        const {r0, c0} = activeShape.current.position;
+        const newPosition = {r0: r0+1, c0};
+        if(!canDrawActiveShapeAtPosition(activeShape.current, newPosition, board)) {
+            setLinesCleared(linesCleared => linesCleared + getNumCompleteLines(board));
+            setBoard(clearLines(board));
+
+            if(activeShape.current.position.r0 === 0) {
+                alert('Game over');
+            } else {
+                // Pick a new active shape
+                activeShape.current = pickNewShape();
+                setBoard(board => drawActiveShapeAtPosition(activeShape.current, activeShape.current.position, board));
+            }
+        }
+    }, [board]);
+
+    useEffect(() => {
+        const onKeyDown = (evt: KeyboardEvent) => {
             switch(evt.key) {
                 case 'ArrowRight':
-                    moveActiveShape({r0, c0: c0+1});
+                    keyboardInputQueue.current.push(() => moveActiveShape({colDelta: 1}));
                     break;
                 case 'ArrowLeft':
-                    moveActiveShape({r0, c0: c0-1});
+                    keyboardInputQueue.current.push(() => moveActiveShape({colDelta: -1}));
                     break;
                 case 'ArrowDown':
-                    moveActiveShape({r0: r0+1, c0});
+                    keyboardInputQueue.current.push(() => moveActiveShape({rowDelta: 1}));
                     break;
                 case 'ArrowUp':
-                    setBoard(board => {
-                        const newShape = rotateMatrix90Degrees(activeShape.current.shape);
-                        // If active shape is in final position (can not descend any further) or can not be drawn using the new shape (because of collisions), then do not apply any state transformations.
-                        if(!canDrawActiveShapeAtPosition(activeShape.current, {r0: r0+1, c0}, board) || !canDrawActiveShapeAsNewShape(activeShape.current, newShape, board)) {
-                            return board;
-                        }
-                        const result = drawActiveShapeAsNewShape(activeShape.current, newShape, board);
-                        activeShape.current.shape = newShape;
-                        return result;
+                    keyboardInputQueue.current.push(() => {
+                        const {r0, c0} = activeShape.current.position;
+                        setBoard(board => {
+                            const newShape = rotateMatrix90Degrees(activeShape.current.shape);
+                            // If active shape is in final position (can not descend any further) or can not be drawn using the new shape (because of collisions), then do not apply any state transformations.
+                            if(!canDrawActiveShapeAtPosition(activeShape.current, {r0: r0+1, c0}, board) || !canDrawActiveShapeAsNewShape(activeShape.current, newShape, board)) {
+                                return board;
+                            }
+                            const result = drawActiveShapeAsNewShape(activeShape.current, newShape, board);
+                            activeShape.current.shape = newShape;
+                            return result;
+                        });
                     });
                     break;
             }
@@ -89,8 +99,7 @@ function Board() {
         return () => window.removeEventListener('keydown', onKeyDown);
     }, []);
 
-    return <Fragment>
-
+    return <div className={styles.container}>
     <div className={styles.board}>
         {board.map((row, rowIndex) => {
             return <div key={rowIndex} className={styles.row}>
@@ -102,7 +111,8 @@ function Board() {
             </div>
         })}
     </div>
-    </Fragment>
+    <p>Lines Cleared: {linesCleared}</p>
+    </div>
 }
 
 export default Board;
