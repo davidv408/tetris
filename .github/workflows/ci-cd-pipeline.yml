@@ -36,5 +36,5 @@ jobs:
       uses: google-github-actions/deploy-cloudrun@v2
       with:
         service: tetris
-        image: ${{ secrets.GAR_IMAGE_LOCATION }}:latest
+        image: ${{ secrets.GAR_IMAGE_LOCATION }}
         region: us-west1
