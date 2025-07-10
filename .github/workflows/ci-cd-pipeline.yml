@@ -1,0 +1,39 @@
+name: CI/CD Pipeline
+on: [push]
+
+jobs:
+  build-test-deploy:
+     # Use Linux-based Github-hosted runner
+    runs-on:  ubuntu-latest
+    # Permissions for Google Cloud Auth
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+    # Build stage
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Set up Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22.16.0
+    - name: Install project dependencies
+      run: npm ci
+    # Deploy stage
+    - name: Set up Google Cloud SDK
+      uses: google-github-actions/auth@v2
+      with:
+        project_id: ${{ secrets.PROJECT_ID }}
+        workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+    - name: Configure Artifact Registry credential helper
+      run: gcloud auth configure-docker ${{ secrets.GAR_REGISTRY_REGION }}-docker.pkg.dev --quiet
+    - name: Build Docker image
+      run: docker build -t ${{ secrets.GAR_IMAGE_LOCATION }} .
+    - name: Push Docker image to Artifact Registry
+      run: docker push ${{ secrets.GAR_IMAGE_LOCATION }}
+    - name: Deploy to Cloud Run
+      uses: google-github-actions/deploy-cloudrun@v2
+      with:
+        service: ci-cd-pipeline-app
+        image: ${{ secrets.GAR_IMAGE_LOCATION }}:latest
+        region: us-west1
