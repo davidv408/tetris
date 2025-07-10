@@ -2,7 +2,7 @@ name: CI/CD Pipeline
 on: [push]
 
 jobs:
-  build-test-deploy:
+  build-deploy:
      # Use Linux-based Github-hosted runner
     runs-on:  ubuntu-latest
     # Permissions for Google Cloud Auth
@@ -34,6 +34,6 @@ jobs:
     - name: Deploy to Cloud Run
       uses: google-github-actions/deploy-cloudrun@v2
       with:
-        service: ci-cd-pipeline-app
+        service: tetris
         image: ${{ secrets.GAR_IMAGE_LOCATION }}:latest
         region: us-west1
