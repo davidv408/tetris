@@ -9,7 +9,6 @@ import {
   pickNewShape,
   rotateMatrix90Degrees,
 } from "../../utils/ActiveShape";
-import type { Board } from "../../interfaces/Board";
 import { clearLines, getNumCompleteLines } from "../../utils/Score";
 
 interface BoardProps {
