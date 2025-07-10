@@ -1,0 +1,12 @@
+.modal {
+  position: absolute;
+  background-color:lightgray;
+  padding: 3rem 1rem;
+  top: 25%;
+  left: 0;
+  right: 0;
+  width: 200px;
+  height: 100px;
+  margin: 0 auto;
+  text-align: center;
+}
