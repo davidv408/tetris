@@ -40,7 +40,7 @@ const Board: FC<BoardProps> = ({ gameIsOver, onGameIsOver }) => {
   useEffect(() => {
     if (gameIsOver) return;
 
-    // Flush keyboard inputs
+    // If there is a keyboard input ready, process it.
     if (keyboardInputQueue.current.length > 0) {
       keyboardInputQueue.current.shift()!();
     }
@@ -63,11 +63,19 @@ const Board: FC<BoardProps> = ({ gameIsOver, onGameIsOver }) => {
     if (
       !canDrawActiveShapeAtPosition(activeShape.current, newPosition, board)
     ) {
+      // Flush keyboard input.
+      if (keyboardInputQueue.current.length > 0) {
+        keyboardInputQueue.current.shift()!();
+        return;
+      }
+
+      // Clear any lines on the board.
       setLinesCleared(
         (linesCleared) => linesCleared + getNumCompleteLines(board),
       );
       setBoard(clearLines(board));
 
+      // Check if game is over. If not, pick a new shape to start descending.
       if (activeShape.current.position.r0 === 0) {
         onGameIsOver();
       } else {
