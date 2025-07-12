@@ -2,42 +2,73 @@ import type { Board } from "../interfaces/Board";
 import type { ActiveShape, Position, Shape } from "../interfaces/Shape";
 
 const shapes: Shape[] = [
-  [
-    // Straight
-    [1, 1, 1, 1],
-  ],
+  {
+    shape: [
+      // Straight
+      [1, 1, 1, 1],
+    ],
+    color: "cyan",
+  },
   // Square
-  [
-    [1, 1],
-    [1, 1],
-  ],
+  {
+    shape: [
+      [1, 1],
+      [1, 1],
+    ],
+    color: "yellow",
+  },
   // T-Shape
-  [
-    [1, 1, 1],
-    [0, 1, 0],
-  ],
-  [
-    // Skew
-    [1, 0],
-    [1, 1],
-    [0, 1],
-  ],
-  [
-    // L-Shape
-    [1, 0],
-    [1, 0],
-    [1, 1],
-  ],
+  {
+    shape: [
+      [1, 1, 1],
+      [0, 1, 0],
+    ],
+    color: "purple",
+  },
+  {
+    shape: [
+      // Left Skew
+      [0, 1, 1],
+      [1, 1, 0],
+    ],
+    color: "green",
+  },
+  {
+    shape: [
+      // Right Skew
+      [1, 1, 0],
+      [0, 1, 1],
+    ],
+    color: "red",
+  },
+  {
+    shape: [
+      // Left L-Shape
+      [1, 0],
+      [1, 0],
+      [1, 1],
+    ],
+    color: "blue",
+  },
+  {
+    shape: [
+      // Right L-Shape
+      [0, 1],
+      [0, 1],
+      [1, 1],
+    ],
+    color: "orange",
+  },
 ];
 
 export function pickNewShape(): ActiveShape {
-  const shape = shapes[Math.floor(Math.random() * shapes.length)];
+  const { shape, color } = shapes[Math.floor(Math.random() * shapes.length)];
 
   // Place the shape (4x4 matrix) at the top of the board (20 x 10)
   const activeShape = {
     position: { r0: 0, c0: 4 },
     shape,
-    color: "blue",
+    color,
   };
 
   return activeShape;
@@ -94,6 +125,9 @@ export function canDrawActiveShapeAtPosition(
   for (let row = 0; row < shape.length; row++) {
     for (let col = 0; col < shape[row].length; col++) {
       if (newBoard[row + newR0][col + newC0].value + shape[row][col] > 1) {
+        console.log(newBoard);
+        console.log(shape);
+        console.log("collision at", row + newR0, col + newC0);
         return false;
       }
     }

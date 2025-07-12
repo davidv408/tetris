@@ -1,9 +1,10 @@
-export type Shape = number[][];
-
-export interface ActiveShape {
-  shape: Shape;
-  position: Position;
+export interface Shape {
+  shape: number[][];
   color: string;
+}
+
+export interface ActiveShape extends Shape {
+  position: Position;
 }
 
 export interface Position {
