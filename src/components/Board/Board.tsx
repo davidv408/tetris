@@ -40,7 +40,7 @@ const Board: FC<BoardProps> = ({ gameIsOver, onGameIsOver }) => {
   useEffect(() => {
     if (gameIsOver) return;
 
-    // If there is a keyboard input ready, process it.
+    // If there is a keyboard input ready, process it in the tick.
     if (keyboardInputQueue.current.length > 0) {
       keyboardInputQueue.current.shift()!();
     }
@@ -58,38 +58,41 @@ const Board: FC<BoardProps> = ({ gameIsOver, onGameIsOver }) => {
   useEffect(() => {
     if (gameIsOver) return;
 
-    const { r0, c0 } = activeShape.current.position;
-    const newPosition = { r0: r0 + 1, c0 };
-    if (
-      !canDrawActiveShapeAtPosition(activeShape.current, newPosition, board)
-    ) {
-      // Flush keyboard input.
-      if (keyboardInputQueue.current.length > 0) {
-        keyboardInputQueue.current.shift()!();
-        return;
-      }
-
-      // Clear any lines on the board.
-      setLinesCleared(
-        (linesCleared) => linesCleared + getNumCompleteLines(board),
-      );
-      setBoard(clearLines(board));
-
-      // Check if game is over. If not, pick a new shape to start descending.
-      if (activeShape.current.position.r0 === 0) {
-        onGameIsOver();
-      } else {
-        // Pick a new active shape
-        activeShape.current = pickNewShape();
-        setBoard((board) =>
-          drawActiveShapeAtPosition(
-            activeShape.current,
-            activeShape.current.position,
-            board,
-          ),
+    // Check if active shape is in its final position, process board for lines that can be cleared and choose a new active
+    // shape to draw. Debounced by 400ms to allow keyboard inputs to flush, the debounce will allow the user to queue up
+    // movements when the active shape can still be moved (e.g. left or right) in its final position.
+    const timerId = setTimeout(() => {
+      const { r0, c0 } = activeShape.current.position;
+      const newPosition = { r0: r0 + 1, c0 };
+      if (
+        !canDrawActiveShapeAtPosition(activeShape.current, newPosition, board)
+      ) {
+        // Clear any lines on the board.
+        setLinesCleared(
+          (linesCleared) => linesCleared + getNumCompleteLines(board),
         );
+        setBoard(clearLines(board));
+
+        // Check if game is over. If not, pick a new shape to start descending.
+        if (activeShape.current.position.r0 === 0) {
+          onGameIsOver();
+        } else {
+          // Pick a new active shape
+          activeShape.current = pickNewShape();
+          setBoard((board) =>
+            drawActiveShapeAtPosition(
+              activeShape.current,
+              activeShape.current.position,
+              board,
+            ),
+          );
+        }
       }
-    }
+    }, 400);
+
+    return () => {
+      clearTimeout(timerId);
+    };
   }, [board, gameIsOver, onGameIsOver]);
 
   useEffect(() => {
@@ -173,6 +176,13 @@ const Board: FC<BoardProps> = ({ gameIsOver, onGameIsOver }) => {
 
   return (
     <div className={styles.container}>
+      <button
+        onClick={() => {
+          debugger;
+        }}
+      >
+        Debug
+      </button>
       <div className={`${styles.board} ${gameIsOver ? styles.gameIsOver : ""}`}>
         {board.map((row, rowIndex) => {
           return (
