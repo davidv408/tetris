@@ -1,6 +1,8 @@
 .modal {
   position: absolute;
-  background-color:lightgray;
+  background-color: lightgrey;
+  color: black;
+  border: 5px solid grey;
   padding: 3rem 1rem;
   top: 10%;
   left: 0;

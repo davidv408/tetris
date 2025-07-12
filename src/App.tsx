@@ -30,7 +30,7 @@ function App() {
       {gameStatus === GameStatus.GAME_OVER && (
         <GameOverModal
           onRestart={() => {
-            setGameStatus(GameStatus.GAME_OVER);
+            setGameStatus(GameStatus.STARTED);
             setBoardKey((boardKey) => boardKey + 1);
           }}
         />

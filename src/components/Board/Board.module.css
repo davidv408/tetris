@@ -2,11 +2,13 @@
     display: flex;
     justify-content: center;
     gap: 1rem;
+    color: white;
 }
 
 .board {
     display: flex;
     flex-direction: column;
+    border: 5px solid grey;
 
     .row {
         display: flex;
@@ -15,7 +17,7 @@
         .cell {
             width: 25px;
             height: 25px;
-            border: 1px solid black;
+            border: 1px solid white;
         }
     }
 }
