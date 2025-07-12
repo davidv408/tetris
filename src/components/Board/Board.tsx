@@ -176,13 +176,6 @@ const Board: FC<BoardProps> = ({ gameIsOver, onGameIsOver }) => {
 
   return (
     <div className={styles.container}>
-      <button
-        onClick={() => {
-          debugger;
-        }}
-      >
-        Debug
-      </button>
       <div className={`${styles.board} ${gameIsOver ? styles.gameIsOver : ""}`}>
         {board.map((row, rowIndex) => {
           return (
