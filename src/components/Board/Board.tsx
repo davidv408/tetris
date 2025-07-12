@@ -60,7 +60,7 @@ const Board: FC<BoardProps> = ({ gameIsOver, onGameIsOver }) => {
 
     // Check if active shape is in its final position, process board for lines that can be cleared and choose a new active
     // shape to draw. Debounced by 400ms to allow keyboard inputs to flush, the debounce will allow the user to queue up
-    // movements when the active shape can still be moved (e.g. left or right) in its final position.
+    // movements (e.g. left or right) before the shape is in its final position.
     const timerId = setTimeout(() => {
       const { r0, c0 } = activeShape.current.position;
       const newPosition = { r0: r0 + 1, c0 };
