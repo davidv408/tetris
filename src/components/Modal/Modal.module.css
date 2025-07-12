@@ -2,11 +2,15 @@
   position: absolute;
   background-color:lightgray;
   padding: 3rem 1rem;
-  top: 25%;
+  top: 10%;
   left: 0;
   right: 0;
-  width: 200px;
-  height: 100px;
+  max-width: 300px;
+  height: fit-content;
   margin: 0 auto;
   text-align: center;
+
+  ul {
+    text-align: left;
+  }
 }

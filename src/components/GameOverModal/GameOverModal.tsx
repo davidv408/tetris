@@ -1,5 +1,5 @@
 import type { FC } from "react";
-import styles from "./GameOverModal.module.css";
+import Modal from "../Modal/Modal";
 
 interface GameOverModalProps {
   onRestart: () => void;
@@ -7,10 +7,10 @@ interface GameOverModalProps {
 
 const GameOverModal: FC<GameOverModalProps> = ({ onRestart }) => {
   return (
-    <div className={styles.modal}>
-      <h2>Game Over!</h2>
-      <button onClick={onRestart}>Restart</button>
-    </div>
+    <Modal
+      title="Game Over"
+      controls={<button onClick={onRestart}>Restart</button>}
+    ></Modal>
   );
 };
 
