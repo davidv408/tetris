@@ -1,0 +1,10 @@
+.controlList {
+    li:not(:last-child) {
+        margin-bottom: 0.5rem;
+    }
+    svg {
+        width: 16px;
+        height: 16px;
+        margin-right: 1rem;
+    }
+}

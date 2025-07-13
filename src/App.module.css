@@ -2,6 +2,6 @@
     position: relative;
     background-color: black;
     padding: 10px;
-    border: 5px solid grey;
+    border: 5px solid lightgrey;
     height: calc(100vh - 30px);
 }
