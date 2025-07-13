@@ -125,9 +125,6 @@ export function canDrawActiveShapeAtPosition(
   for (let row = 0; row < shape.length; row++) {
     for (let col = 0; col < shape[row].length; col++) {
       if (newBoard[row + newR0][col + newC0].value + shape[row][col] > 1) {
-        console.log(newBoard);
-        console.log(shape);
-        console.log("collision at", row + newR0, col + newC0);
         return false;
       }
     }
