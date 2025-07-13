@@ -30,6 +30,8 @@
 @media screen and (max-width: 600px) {
     .container {
         flex-direction: column;
+        width: fit-content;
+        margin: 0 auto;
     }
 
     .board {
